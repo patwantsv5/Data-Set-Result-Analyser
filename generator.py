@@ -40,9 +40,8 @@ def accumulate_and_flag(df):
 
     # Generate Error Flag if MAE of each individual reaches threshold
     mae_data[Nugget.ERROR_FLAG] = 0.0
-    error_threshold = 5
     for i in range(0, len(mae_data)):
-        if mae_data[Nugget.MAE_PER_ROW][i] > error_threshold:
+        if mae_data[Nugget.MAE_PER_ROW][i] > Nugget.THRESHOLD:
             mae_data.loc[i, Nugget.ERROR_FLAG] = 1
         else:
             mae_data.loc[i, Nugget.ERROR_FLAG] = 0
@@ -63,9 +62,8 @@ def make_new_average_csv(df, split_indices, mae_data):
     # Add Alerts just in case.
     # Generate Error Flag if MAE of each individual reaches threshold
     alerts = []
-    error_threshold = 5
     for i in range(0, len(split_indices)-1):
-        if avg_mae_list[i] > error_threshold:
+        if avg_mae_list[i] > Nugget.THRESHOLD:
             alerts.append(1)
         else:
             alerts.append(0)
@@ -81,7 +79,7 @@ def make_new_average_csv(df, split_indices, mae_data):
                 error_numbers.append(1)
             else:
                 error_numbers.append(0)
-        up_time.append((1.0 - (mae_data[Nugget.ERROR_FLAG][start:end].mean())) *100)
+        up_time.append(f"{((1.0 - (mae_data[Nugget.ERROR_FLAG][start:end].mean())) *100)}%")
         error_numbers = []
 
     # Create New Polars DataFrame
