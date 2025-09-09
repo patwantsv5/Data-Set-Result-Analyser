@@ -8,11 +8,8 @@ from params import Nugget
 # respective to their own operation_id, 
 # with individual MAE per time step and total average MAE for the whole operation.
 
-def accumulate_and_flag(df):
+def accumulate_and_flag(df, split_indices):
     mae_data = df.copy()
-    split_indices = df.index[(df[Nugget.ACTUALS] == 0) & (df[Nugget.ACTUALS].shift(1) > 0)].tolist()
-    split_indices.insert(0, 0) 
-    split_indices.append(len(df))
 
     # Generate a new row to differentiate new operations.
     mae_data[Nugget.OPERATION_ID] = 0
@@ -21,16 +18,16 @@ def accumulate_and_flag(df):
         end = split_indices[i]
         mae_data.loc[start:end-1, Nugget.OPERATION_ID] = i
 
-    # Generate Accumulated MAE for each operation
-    mae_data[Nugget.ACCUM_MAE_PER_OP] = 0.0
-    for i in range(1, len(split_indices)):
-        start = split_indices[i-1] 
-        end = split_indices[i] 
-        for x in range(start,end): 
-            y_actuals = df[Nugget.ACTUALS][start:x+1]
-            y_predictions = df[Nugget.PREDICTIONS][start:x+1]
-            mae = mean_absolute_error(y_actuals, y_predictions) 
-            mae_data.at[x, Nugget.ACCUM_MAE_PER_OP] = mae
+    # # Generate Accumulated MAE for each operation
+    # mae_data[Nugget.ACCUM_MAE_PER_OP] = 0.0
+    # for i in range(1, len(split_indices)):
+    #     start = split_indices[i-1] 
+    #     end = split_indices[i] 
+    #     for x in range(start,end): 
+    #         y_actuals = df[Nugget.ACTUALS][start:x+1]
+    #         y_predictions = df[Nugget.PREDICTIONS][start:x+1]
+    #         mae = mean_absolute_error(y_actuals, y_predictions) 
+    #         mae_data.at[x, Nugget.ACCUM_MAE_PER_OP] = mae
 
     # Calculate MAE for EACH individual row.
     mae_data[Nugget.MAE_PER_ROW] = 0.0
@@ -45,8 +42,6 @@ def accumulate_and_flag(df):
             mae_data.loc[i, Nugget.ERROR_FLAG] = 1
         else:
             mae_data.loc[i, Nugget.ERROR_FLAG] = 0
-
-    make_new_average_csv(df, split_indices, mae_data)
     return mae_data
 
 def make_new_average_csv(df, split_indices, mae_data):
@@ -89,10 +84,21 @@ def make_new_average_csv(df, split_indices, mae_data):
         Nugget.ERROR_FLAG : alerts,
         Nugget.UP_TIME_ACCURACY: up_time
     })
-    csv_new.write_csv(Nugget.FILE_NAME)
+    csv_new.write_csv(os.path.join("outputs", Nugget.FILE_NAME))
+
+def calculate_total_accuracy(pl_df):
+    pass
 
 if __name__ == "__main__":
-    df = pl.read_csv(Nugget.DATA_FRAME)
+    df = pl.read_csv(os.path.join("inputs", Nugget.DATA_FRAME))
     df = df.to_pandas()
-    mae_data = accumulate_and_flag(df)
-    mae_data.to_csv("output.csv")
+
+    # Split Indices #
+    split_indices = df.index[(df[Nugget.ACTUALS] == 0) & (df[Nugget.ACTUALS].shift(1) > 0)].tolist()
+    split_indices.insert(0, 0) 
+    split_indices.append(len(df))
+    # ============= #
+
+    mae_data = accumulate_and_flag(df, split_indices)
+    make_new_average_csv(df, split_indices, mae_data)
+    mae_data.to_csv("outputs/output.csv")

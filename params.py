@@ -3,7 +3,7 @@ from dataclasses import dataclass
 @dataclass
 class Nugget:
         # DataFrame File to Load, or just leave empty if just calling function #
-    DATA_FRAME: str = 'resultsTFT.csv'
+    DATA_FRAME: str = 'RESARUTO.csv'
         # Base Parameters in DataFrame #
     PREDICTIONS: str = 'predictions'
     ACTUALS: str = 'actuals'
@@ -18,7 +18,7 @@ class Nugget:
 
 
         # Flag for ERROR if value above threashold #
-    THRESHOLD: int = 5
+    THRESHOLD: int = 3
     ERROR_FLAG: str = 'Error Flag'
 
         # Calculate Average MAE for each Operation #
@@ -27,4 +27,4 @@ class Nugget:
         # Accuracy and Uptime of MAE being under threshold. #
     UP_TIME_ACCURACY: str = 'Accuracy Up-time'
         # File name to save #
-    FILE_NAME: str = 'Average_MAE_CSV.csv'
+    FILE_NAME: str = 'RESAURTO_OUTPUT.csv'
