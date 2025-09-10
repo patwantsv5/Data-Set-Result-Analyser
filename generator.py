@@ -97,7 +97,7 @@ def histogram_accuracy_grouping(pl_df):
         "85+":[],
         "90+":[],
         "95+":[],
-        "Unique Operation ID":[]
+        # "Unique Operation ID":[]
     }
     percent = []
     for i in pl_df[Nugget.UP_TIME_ACCURACY]:
@@ -117,7 +117,7 @@ def histogram_accuracy_grouping(pl_df):
             isolated_ranges_groups["95+"].append(val)
         if val < 80:
             isolated_ranges_groups["UnLabelled"].append(val)
-        isolated_ranges_groups["Unique Operation ID"].append(val)
+        # isolated_ranges_groups["Unique Operation ID"].append(val)
     histo = pl.DataFrame({
         label: [len(vals)] for label, vals in isolated_ranges_groups.items()
     })
