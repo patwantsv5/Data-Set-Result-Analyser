@@ -91,13 +91,35 @@ def make_new_average_csv(df, split_indices, mae_data):
     return csv_new
 
 def histogram_accuracy_grouping(pl_df):
+    isolated_ranges_groups = {
+        "UnLabelled": [],
+        "80-85":[],
+        "85-90":[],
+        "90-95":[],
+        "95-100":[]
+    }
     percent = []
     for i in pl_df[Nugget.UP_TIME_ACCURACY]:
         k = i.replace("%","")
         percent.append(float(k))
     percent = pl.Series(percent)
-    histo = percent.hist(bin_count=10)
+    # categorized_percentage = percent.filter((percent >= 80) & (percent <=100)) # FILTERED
+    for val in percent:
+        if 80 <= val < 85:
+            isolated_ranges_groups["80-85"].append(val)
+        elif 85 <= val < 90:
+            isolated_ranges_groups["85-90"].append(val)
+        elif 90 <= val < 95:
+            isolated_ranges_groups["90-95"].append(val)
+        elif 95 <= val < 100:
+            isolated_ranges_groups["95-100"].append(val)
+        else:
+            isolated_ranges_groups["UnLabelled"].append(val)
+    histo = pl.DataFrame({
+        label: [len(vals)] for label, vals in isolated_ranges_groups.items()
+    })
     histo.write_csv(os.path.join("outputs", "Histogram.csv"))
+    return isolated_ranges_groups
 
 if __name__ == "__main__":
     df = pl.read_csv(os.path.join("inputs", Nugget.DATA_FRAME))
@@ -111,7 +133,7 @@ if __name__ == "__main__":
 
     mae_data = accumulate_and_flag(df, split_indices)
     csv_new = make_new_average_csv(df, split_indices, mae_data)
-    histogram_accuracy_grouping(csv_new)
+    isolated_ranges_groupings = histogram_accuracy_grouping(csv_new)
     mae_data.to_csv("outputs/output.csv")
 
     # Plottings, Additionals.

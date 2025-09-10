@@ -18,7 +18,6 @@ def scatter_plot_x_y(df, x, y, title, file_name, additionals1):
             title=title
         )
     else:
-        # Histogram
         chart = alt.Chart(df).mark_circle(size=80).encode(
             alt.X(x, title=x),
             alt.Y(y, title=y),
@@ -29,5 +28,4 @@ def scatter_plot_x_y(df, x, y, title, file_name, additionals1):
             title=title
         )
 
-    chart.show()  # opens in browser
     chart.save(os.path.join("outputs", file_name),"png")  # saves as interactive HTML
