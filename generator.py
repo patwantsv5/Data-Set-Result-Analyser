@@ -93,10 +93,11 @@ def make_new_average_csv(df, split_indices, mae_data):
 def histogram_accuracy_grouping(pl_df):
     isolated_ranges_groups = {
         "UnLabelled": [],
-        "80-85":[],
-        "85-90":[],
-        "90-95":[],
-        "95-100":[]
+        "80+":[],
+        "85+":[],
+        "90+":[],
+        "95+":[],
+        "Unique Operation ID":[]
     }
     percent = []
     for i in pl_df[Nugget.UP_TIME_ACCURACY]:
@@ -104,17 +105,19 @@ def histogram_accuracy_grouping(pl_df):
         percent.append(float(k))
     percent = pl.Series(percent)
     # categorized_percentage = percent.filter((percent >= 80) & (percent <=100)) # FILTERED
+
     for val in percent:
-        if 80 <= val < 85:
-            isolated_ranges_groups["80-85"].append(val)
-        elif 85 <= val < 90:
-            isolated_ranges_groups["85-90"].append(val)
-        elif 90 <= val < 95:
-            isolated_ranges_groups["90-95"].append(val)
-        elif 95 <= val < 100:
-            isolated_ranges_groups["95-100"].append(val)
-        else:
+        if 80 <= val:
+            isolated_ranges_groups["80+"].append(val)
+        if 85 <= val:
+            isolated_ranges_groups["85+"].append(val)
+        if 90 <= val:
+            isolated_ranges_groups["90+"].append(val)
+        if 95 <= val:
+            isolated_ranges_groups["95+"].append(val)
+        if val < 80:
             isolated_ranges_groups["UnLabelled"].append(val)
+        isolated_ranges_groups["Unique Operation ID"].append(val)
     histo = pl.DataFrame({
         label: [len(vals)] for label, vals in isolated_ranges_groups.items()
     })
