@@ -3,6 +3,8 @@ from sklearn.metrics import mean_absolute_error
 import polars as pl
 # import matplotlib.pyplot as plt
 from params import Nugget
+# import altair as alt
+from additional_plottings import scatter_plot_x_y
 
 # 2025/09/04 - make it so that each operation has its own resultTFT.csv file, 
 # respective to their own operation_id, 
@@ -86,8 +88,16 @@ def make_new_average_csv(df, split_indices, mae_data):
     })
     csv_new.write_csv(os.path.join("outputs", Nugget.FILE_NAME))
 
-def calculate_total_accuracy(pl_df):
-    pass
+    return csv_new
+
+def histogram_accuracy_grouping(pl_df):
+    percent = []
+    for i in pl_df[Nugget.UP_TIME_ACCURACY]:
+        k = i.replace("%","")
+        percent.append(float(k))
+    percent = pl.Series(percent)
+    histo = percent.hist(bin_count=10)
+    histo.write_csv(os.path.join("outputs", "Histogram.csv"))
 
 if __name__ == "__main__":
     df = pl.read_csv(os.path.join("inputs", Nugget.DATA_FRAME))
@@ -100,5 +110,17 @@ if __name__ == "__main__":
     # ============= #
 
     mae_data = accumulate_and_flag(df, split_indices)
-    make_new_average_csv(df, split_indices, mae_data)
+    csv_new = make_new_average_csv(df, split_indices, mae_data)
+    histogram_accuracy_grouping(csv_new)
     mae_data.to_csv("outputs/output.csv")
+
+    # Plottings, Additionals.
+    try:
+    # Plot Operation ID to Up Time Accuracy
+        percent_float = [float(i.replace("%","")) for i in csv_new[Nugget.UP_TIME_ACCURACY]]
+        scatter_plot_x_y(df=csv_new, x=Nugget.OPERATION_ID, y=Nugget.UP_TIME_ACCURACY,
+                        title="Plot Operation ID to Up Time Accuracy",
+                        file_name="Up_Time_To_Operation_ID.png",
+                        additionals1=percent_float)
+    except Exception as e:
+        print(f"Failed to generate plot: {e}")
