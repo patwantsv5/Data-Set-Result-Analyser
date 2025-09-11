@@ -175,7 +175,7 @@ if __name__ == "__main__":
     percent_float = [float(i.replace("%","")) for i in csv_new[Nugget.UP_TIME_ACCURACY]]
     scatter_plot_x_y(df=csv_new, x=Nugget.OPERATION_ID, y=Nugget.UP_TIME_ACCURACY,
                     title="Plot Operation ID to Up Time Accuracy",
-                    file_name="Up_Time_To_Operation_ID.png",
+                    file_name="Up_Time_To_Operation_ID",
                     additionals1=percent_float)
     # except Exception as e:
     #     print(f"Failed to generate plot: {e}")
