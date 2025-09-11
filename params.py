@@ -3,7 +3,7 @@ from dataclasses import dataclass
 @dataclass
 class Nugget:
         # DataFrame File to Load, or just leave empty if just calling function #
-    DATA_FRAME: str = 'RESARUTO.csv'
+    FILE_NAME: str = '9_11.csv'
         # Base Parameters in DataFrame #
     PREDICTIONS: str = 'predictions'
     ACTUALS: str = 'actuals'
@@ -26,5 +26,3 @@ class Nugget:
 
         # Accuracy and Uptime of MAE being under threshold. #
     UP_TIME_ACCURACY: str = 'Accuracy Up-time'
-        # File name to save #
-    FILE_NAME: str = 'RESAURTO_OUTPUT.csv'

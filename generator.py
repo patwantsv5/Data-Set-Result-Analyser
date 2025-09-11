@@ -86,7 +86,7 @@ def make_new_average_csv(df, split_indices, mae_data):
         Nugget.ERROR_FLAG : alerts,
         Nugget.UP_TIME_ACCURACY: up_time
     })
-    csv_new.write_csv(os.path.join("outputs", Nugget.FILE_NAME))
+    csv_new.write_csv(os.path.join("outputs", f"{Nugget.FILE_NAME}_Operation_And_Accuracy.csv"))
 
     return csv_new
 
@@ -121,11 +121,12 @@ def histogram_accuracy_grouping(pl_df):
     histo = pl.DataFrame({
         label: [len(vals)] for label, vals in isolated_ranges_groups.items()
     })
-    histo.write_csv(os.path.join("outputs", "Histogram.csv"))
+    # file_name = f"{Nugget.FILE_NAME}_Histogram.csv"
+    histo.write_csv(os.path.join("outputs", f"{Nugget.FILE_NAME}_Histogram.csv"))
     return isolated_ranges_groups
 
 if __name__ == "__main__":
-    df = pl.read_csv(os.path.join("inputs", Nugget.DATA_FRAME))
+    df = pl.read_csv(os.path.join("inputs", Nugget.FILE_NAME))
     df = df.to_pandas()
 
     # Split Indices #
@@ -137,7 +138,7 @@ if __name__ == "__main__":
     mae_data = accumulate_and_flag(df, split_indices)
     csv_new = make_new_average_csv(df, split_indices, mae_data)
     isolated_ranges_groupings = histogram_accuracy_grouping(csv_new)
-    mae_data.to_csv("outputs/output.csv")
+    mae_data.to_csv(os.path.join("outputs", f"{Nugget.FILE_NAME}_Individual_MAE.csv"), index=False)
 
     # Plottings, Additionals.
     # try:
