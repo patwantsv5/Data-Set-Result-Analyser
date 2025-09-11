@@ -110,39 +110,49 @@ def make_new_average_csv(df, split_indices, mae_data):
     return csv_new
 
 def histogram_accuracy_grouping(pl_df):
-    isolated_ranges_groups = {
-        "UnLabelled": [],
-        "80+":[],
-        "85+":[],
-        "90+":[],
-        "95+":[],
-        # "Unique Operation ID":[]
-    }
-    percent = []
-    for i in pl_df[Nugget.UP_TIME_ACCURACY]:
-        k = i.replace("%","")
-        percent.append(float(k))
-    percent = pl.Series(percent)
-    # categorized_percentage = percent.filter((percent >= 80) & (percent <=100)) # FILTERED
+    # Nested dictionary: one per group, each with bins
+    histogram = {"All": {"UnLabelled": [], "80+": [], "85+": [], "90+": [], "95+": []}}
+    for i in Nugget.MONTHS_DATA:
+        histogram[i] = {"UnLabelled": [], "80+": [], "85+": [], "90+": [], "95+": []}
 
-    for val in percent:
-        if 80 <= val:
-            isolated_ranges_groups["80+"].append(val)
-        if 85 <= val:
-            isolated_ranges_groups["85+"].append(val)
-        if 90 <= val:
-            isolated_ranges_groups["90+"].append(val)
-        if 95 <= val:
-            isolated_ranges_groups["95+"].append(val)
-        if val < 80:
-            isolated_ranges_groups["UnLabelled"].append(val)
-        # isolated_ranges_groups["Unique Operation ID"].append(val)
-    histo = pl.DataFrame({
-        label: [len(vals)] for label, vals in isolated_ranges_groups.items()
-    })
-    # file_name = f"{Nugget.FILE_NAME}_Histogram.csv"
-    histo.write_csv(os.path.join("outputs", f"{Nugget.FILE_NAME}_Histogram.csv"))
-    return isolated_ranges_groups
+    # Loop through rows with enumerate to get index
+    for idx, val_str in enumerate(pl_df[Nugget.UP_TIME_ACCURACY]):
+        # Convert "90%" → float
+        val = float(val_str.replace("%", ""))
+
+        # Determine which groups this row belongs to
+        filename = pl_df[Nugget.FILE_NAME_CSV][idx]
+        groups = ["All"]
+        
+        for date in Nugget.MONTHS_DATA:
+            if date in filename:
+                groups.append(date)
+
+        # Append to bins for each group
+        for group in groups:
+            if val < 80:
+                histogram[group]["UnLabelled"].append(val)
+            if val >= 80:
+                histogram[group]["80+"].append(val)
+            if val >= 85:
+                histogram[group]["85+"].append(val)
+            if val >= 90:
+                histogram[group]["90+"].append(val)
+            if val >= 95:
+                histogram[group]["95+"].append(val)
+
+    # Flatten nested dict into table for CSV
+    rows = []
+    for group_name, bins in histogram.items():
+        row = {"Date": group_name}
+        for bin_name, values in bins.items():
+            row[bin_name] = len(values)
+        rows.append(row)
+
+    histo_df = pl.DataFrame(rows)
+    histo_df.write_csv(os.path.join("outputs", f"{Nugget.FILE_NAME}_Histogram.csv"))
+
+    return histogram
 
 if __name__ == "__main__":
     df = pl.read_csv(os.path.join("inputs", Nugget.FILE_NAME))

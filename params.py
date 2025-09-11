@@ -24,5 +24,7 @@ class Nugget:
         # Calculate Average MAE for each Operation #
     AVERAGE_MAE: str = 'Average MAE'
 
+    MONTHS_DATA: list = ("2507","2508")
+
         # Accuracy and Uptime of MAE being under threshold. #
     UP_TIME_ACCURACY: str = 'Accuracy Up-time'
