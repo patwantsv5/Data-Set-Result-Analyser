@@ -3,7 +3,7 @@ from dataclasses import dataclass
 @dataclass
 class Nugget:
         # DataFrame File to Load, or just leave empty if just calling function #
-    FILE_NAME: str = '9_11.csv'
+    FILE_NAME: str = '9_11.csv' # file name for input
         # Base Parameters in DataFrame #
     PREDICTIONS: str = 'predictions'
     ACTUALS: str = 'actuals'
@@ -16,7 +16,7 @@ class Nugget:
         # Invididual MAE for each row #
     MAE_PER_ROW: str = 'Individual MAE per Row'
 
-
+    FILE_NAME_CSV: str = 'file_name' # FILE NAME FOR INDIVIDUAL CSV, IF HAVE
         # Flag for ERROR if value above threashold #
     THRESHOLD: int = 3
     ERROR_FLAG: str = 'Error Flag'

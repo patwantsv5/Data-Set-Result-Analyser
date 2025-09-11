@@ -10,6 +10,11 @@ from additional_plottings import scatter_plot_x_y
 # respective to their own operation_id, 
 # with individual MAE per time step and total average MAE for the whole operation.
 
+def Apply_File_Name(df):
+    # Apply File Name to dataset, if dataset has additional column with filenames.
+    name = list(dict.fromkeys(df[Nugget.FILE_NAME_CSV]))
+    return name
+
 def accumulate_and_flag(df, split_indices):
     mae_data = df.copy()
 
@@ -79,8 +84,22 @@ def make_new_average_csv(df, split_indices, mae_data):
         up_time.append(f"{((1.0 - (mae_data[Nugget.ERROR_FLAG][start:end].mean())) *100)}%")
         error_numbers = []
 
+    try:
+        name = Apply_File_Name(df=df)
+    except Exception as e:
+        print("File name for each operation not found. Skipping.")
+
     # Create New Polars DataFrame
-    csv_new = pl.DataFrame({
+    if "name" in locals():
+        csv_new = pl.DataFrame({
+        Nugget.OPERATION_ID : list(range(1,num_ops+1)),
+        Nugget.AVERAGE_MAE : avg_mae_list,
+        Nugget.ERROR_FLAG : alerts,
+        Nugget.UP_TIME_ACCURACY: up_time,
+        Nugget.FILE_NAME_CSV : name
+    })
+    else:
+        csv_new = pl.DataFrame({
         Nugget.OPERATION_ID : list(range(1,num_ops+1)),
         Nugget.AVERAGE_MAE : avg_mae_list,
         Nugget.ERROR_FLAG : alerts,
