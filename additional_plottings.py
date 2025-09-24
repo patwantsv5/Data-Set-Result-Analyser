@@ -55,7 +55,25 @@ def scatter_plot_x_y(df, x, y, title, file_name, additionals1):
             title=f"{title} Split by Date"
         )
         chart2 = points + threshold_line
-        chart2.save(os.path.join("outputs", f"{file_name}_Sort_By_Date.png"),"png")  # saves as interactive HTML
+        chart2.save(os.path.join("outputs", f"{file_name}_Split_By_Date.png"),"png")  # saves as interactive HTML
+
+        # Sort by Date Chart
+        # Convert your Date column to datetime (if not already)
+        # Create the chart
+        points = alt.Chart(new_df).mark_circle(size=80).encode(
+            x=alt.X("Date:T", title="Date"),   # <- temporal axis
+            y=alt.Y("percent", title=y),
+            color=alt.Color("Date:T", title="Date")  # optional, keeps colors consistent
+        ).properties(
+            width=700,
+            height=500,
+            title=f"{title} Split by Date"
+        )
+
+        chart2 = points + threshold_line
+
+        # Save chart
+        chart2.save(os.path.join("outputs", f"{file_name}_Sort_By_Date.png"), "png")
     else:
         chart = alt.Chart(df).mark_circle(size=80).encode(
             alt.X(x, title=x),

@@ -1,6 +1,7 @@
 import os
 from sklearn.metrics import mean_absolute_error
 import polars as pl
+import re
 # import matplotlib.pyplot as plt
 from params import Nugget
 # import altair as alt
@@ -154,6 +155,15 @@ def histogram_accuracy_grouping(pl_df):
 
     return histogram
 
+# Adds new colmumn of date,
+def Get_Respective_Date(df):
+    # 342,28.0,29.143242,ABD_250709_1.csv
+    df = df.with_columns(pl.col("file_name").str.extract(r"_(\d{6})_").alias("date_str"))
+
+    df = df.with_columns(pl.col("date_str").str.strptime(pl.Date,format="%y%m%d").alias("date"))
+
+    return df
+
 if __name__ == "__main__":
     df = pl.read_csv(os.path.join("inputs", Nugget.FILE_NAME))
     df = df.to_pandas()
@@ -169,11 +179,12 @@ if __name__ == "__main__":
     isolated_ranges_groupings = histogram_accuracy_grouping(csv_new)
     mae_data.to_csv(os.path.join("outputs", f"{Nugget.FILE_NAME}_Individual_MAE.csv"), index=False)
 
+    updated_csv_new = Get_Respective_Date(csv_new)
     # Plottings, Additionals.
     # try:
     # Plot Operation ID to Up Time Accuracy
-    percent_float = [float(i.replace("%","")) for i in csv_new[Nugget.UP_TIME_ACCURACY]]
-    scatter_plot_x_y(df=csv_new, x=Nugget.OPERATION_ID, y=Nugget.UP_TIME_ACCURACY,
+    percent_float = [float(i.replace("%","")) for i in updated_csv_new[Nugget.UP_TIME_ACCURACY]]
+    scatter_plot_x_y(df=updated_csv_new, x=Nugget.OPERATION_ID, y=Nugget.UP_TIME_ACCURACY,
                     title="Plot Operation ID to Up Time Accuracy",
                     file_name="Up_Time_To_Operation_ID",
                     additionals1=percent_float)
