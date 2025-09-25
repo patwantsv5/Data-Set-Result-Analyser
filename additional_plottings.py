@@ -37,10 +37,8 @@ def scatter_plot_x_y(df, x, y, title, file_name, additionals1):
 
         # Split Date Chart
         Date = []
-        for deeze in df[Nugget.FILE_NAME_CSV]:
-            for date in Nugget.MONTHS_DATA:
-                if date in deeze:
-                    Date.append(date)
+        for deeze in df['date']:
+            Date.append(deeze)
         new_df = pd.DataFrame({x: df[x],
             "percent": additionals1,
             "Ranges" : range_label,
@@ -48,7 +46,7 @@ def scatter_plot_x_y(df, x, y, title, file_name, additionals1):
         points = alt.Chart(new_df).mark_circle(size=80).encode(
             alt.X(x,title=x),
             alt.Y("percent",title=y),
-            color=alt.Color("Date", title="Bins")
+            color=alt.Color("Date:T", scale=alt.Scale(scheme="turbo"), title="Bins")
         ).properties(
             width=700,
             height=500,
@@ -63,11 +61,11 @@ def scatter_plot_x_y(df, x, y, title, file_name, additionals1):
         points = alt.Chart(new_df).mark_circle(size=80).encode(
             x=alt.X("Date:T", title="Date"),   # <- temporal axis
             y=alt.Y("percent", title=y),
-            color=alt.Color("Date:T", title="Date")  # optional, keeps colors consistent
+            color=alt.Color("Date:T", scale=alt.Scale(scheme="turbo"), title="Bins")  # optional, keeps colors consistent
         ).properties(
             width=700,
             height=500,
-            title=f"{title} Split by Date"
+            title=f"{title} Sort by Date"
         )
 
         chart2 = points + threshold_line

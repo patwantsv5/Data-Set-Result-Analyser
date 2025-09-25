@@ -106,6 +106,11 @@ def make_new_average_csv(df, split_indices, mae_data):
         Nugget.ERROR_FLAG : alerts,
         Nugget.UP_TIME_ACCURACY: up_time
     })
+        
+    def add_proper_date(df):
+        df = df.with_columns(pl.col("file_name").str.extract(r"_(\d{6})_").str.strptime(pl.Date, format="%y%m%d").alias("date"))
+        return df
+    csv_new = add_proper_date(csv_new)
     csv_new.write_csv(os.path.join("outputs", f"{Nugget.FILE_NAME}_Operation_And_Accuracy.csv"))
 
     return csv_new
